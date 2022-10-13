@@ -1,6 +1,4 @@
-# Node.js 시작하기
-
-## Node.js란?
+# Node.js란 무엇인가?
 
 > "Node.js®는 Chrome V8 JavaScript 엔진으로 빌드된 JavaScript 런타임입니다."
 
