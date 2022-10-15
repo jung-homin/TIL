@@ -135,3 +135,135 @@ var newObject = {
 ```
 
 화살표 함수는 함수 선언문(function)으로 선언한 함수와 this 스코프가 다르다. 기본 적으로 함수 내부에서의 this는 전역객체인 window를 가리키지만 화살표 함수 안에서의 this는 상위 스코프의 this를 상속받는다. 때문에 기본적으로 화살표 함수를 사용하되 this에 따라 함수 선언문과 화살표 함수를 선택해 사용하자.
+
+## 구조분해 할당
+
+구조분해 할당은 Javascript 객체나 배열의 요소를 쉽게 꺼내어 개별 변수에 담을 수 있게 해주는 표현식이다.
+
+```javascript
+var array = [1, 2, 3, 4, 5];
+var a = array[0]; // 1
+var b = array[1]; // 2
+var c = [array[2], array[3], array[4]]; // [3, 4, 5]
+```
+
+위 코드는 ES6 이전에 배열의 요소를 꺼내어 개별 변수에 담는 코드다.
+
+```javascript
+const array = [1, 2, 3, 4, 5];
+const [a, b, ...c] = array;
+```
+
+위 코드는 앞서 보았던 ES6 이전의 코드와 동일한 결과를 만든다. `const [a, b, ...c] = array;` 각각의 변수 a, b, c에 array란 배열 안에 있는 값을 "순서대로" 대입하는 코드이다. 즉 array의 첫 번째 요소인 1이 a에 들어가고 두 번째 요소인 2가 b에 들어간다. 여기서 주의깊게 봐야할 부분은 `...c`다. c는 세 번째 자리이기 때문에 array의 세 번째 요소인 3을 대입해야 하지만 변수명 앞에 ...가 붙었을 경우 해당 자리부터 배열의 모든 값을 배열로 담아 대입하게 된다. 즉 세 번째 자리인 3부터 4, 5가 배열로 c에 대입되는 것이다.
+
+```javascript
+var object = {
+  name: "호민",
+  age: 25,
+  skill: {
+    javascript: "초급",
+  },
+};
+var name = object.name; // 호민
+var javascript = object.skill.javascript; // 초급
+```
+
+위 코드는 ES6 이전에 객체의 요소를 꺼내어 개별 변수에 담는 코드다.
+
+```javascript
+const object = {
+  name: "호민",
+  age: 25,
+  skill: {
+    javascript: "초급",
+  },
+};
+const {
+  name,
+  skill: { javascript },
+} = object;
+```
+
+위 코드 역시 ES6 이전의 코드와 동일한 결과를 만든다. `const {name, skill: {javascript}} = object` 변수 name과 javascript에 object에 있는 요소들이 할당되어 초기화 된다. 이때 변수명은 객체에서 가져올 속성명과 같아야하며 여러단계 안의 속성을 가져올 경우 해당 구조를 표현해주면 된다.
+
+## 클래스
+
+ES6 전에는 없던 클래스 문법이 추가되었다. 단, 문법만 보기 좋게 바뀌었을 뿐 동작은 프로토타입 기반으로 동작한다.
+
+```javascript
+function Person(name, age, country) {
+  this.name = name;
+  this.age = age;
+  this.country = country;
+}
+
+Person.isKorean = function (person) {
+  return person.country == "대한민국";
+};
+var me = new Person("호민", 25, "대한민국");
+console.log(me.name, me.age, me.country); // 호민 25 남
+console.log(Person.isKorean(me)); // true
+```
+
+위 코드는 ES6 이전의 객체를 생성하는 생성자 함수이다. 위 코드를 클래스 기반으로 바꾸면 동일한 동작을 하는 아래와 같은 코드가 된다.
+
+```javascript
+class Person {
+  constructor(name, age, country) {
+    this.name = name;
+    this.age = age;
+    this.country = country;
+  }
+
+  static isKorean(person) {
+    return person.country == "대한민국";
+  }
+}
+
+const me = new Person("호민", 25, "대한민국");
+console.log(me.name, me.age, me.country); // 호민 25 남
+console.log(Person.isKorean(me)); // true
+```
+
+**클래스는 기초적인 문법은 이해하겠는데 프로토타입과 상속 관련해서 제대로 이하해지 못하고 있다. 추가로 이해한 부분을 추후에 기입하도록 한다.**
+
+## 프로미스
+
+프로미스를 쉽게 설명하면 아래와 같다.
+
+> 실행은 바로 하되 결괏값은 나중에 받는 객체
+
+```javascript
+const condition = true;
+const myPromise = new Promise((resolve, reject) => {
+  console.log("비동기식, 실행은 먼저 합니다~");
+  setTimeout(() => {
+    condition ? resolve("성공") : reject("실패");
+  }, 500);
+});
+
+myPromise
+  .then((message) => {
+    console.log(message);
+  })
+  .catch((error) => {
+    console.log(error);
+  })
+  .finally(() => {
+    console.log("Promise 종료");
+  });
+
+// 실행은 먼저 합니다.
+// 성공
+// Promise 종료
+```
+
+위 코드를 하나씩 살펴보자. `new Promise()`는 매개변수로 콜백함수를 받아 프로미스를 생성하는데 이때 다시 콜백함수는 `resolve`와 `reject`를 매개변수로 받을 수 있다. 해당 콜백함수는 비동기식으로 즉시 실행되며 내부 코드에 따라 매개변수로 받았던 `resolve`와`reject`를 호출한다. 위 코드에서는 변수 `condition`의 값이 `true`이기 때문에 `resolve`를 호출한다. 이렇게 만든 프로미스 변수에 ` then`, `catch`, `finally`메서드를 붙일 수 있는데 프로미스 생성시 `resolve`를 호출했을 경우 `then`이 실행되고 `reject`를 호출했을 경우 `catch`가 실행된다. 마지막으로 `finally`는 `resolve`, `reject`의 호출 여부와 상관없이 실행된다. 위 코드에선 `resolve`가 호출되었기 때문에 `then`이 실행된다. 이때 `resolve`를 호출할 때 넣었던 인수를 then의 콜백함수의 매개변수로 받을 수 있다. 즉 위 코드에서 `message`는 "성공"이 된다.
+
+## async/await
+
+async와 awiat는 비동기 프로그래밍을 할 때 많은 도움이 되며 프로미스를 사용한 코드를 더 깔끔하게 줄일 수 있다.
+
+```javascript
+
+```
